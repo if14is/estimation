@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATM Project Management Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#8b5cf6',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .file-drop-zone {
+            border: 2px dashed #cbd5e0;
+            transition: all 0.3s ease;
+        }
+
+        .file-drop-zone.dragover {
+            border-color: #3b82f6;
+            background-color: #f0f9ff;
+        }
+
+        .error-message {
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+
+        .success-message {
+            background-color: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+
+        .task-item {
+            transition: all 0.3s ease;
+        }
+
+        .task-item.completed {
+            opacity: 0.7;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-primary to-secondary text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                    <i class="fas fa-calendar-check text-2xl"></i>
+                    <h1 class="text-2xl font-bold">نظام إدارة مشروع ATM</h1>
+                </div>
+                <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                    <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                        <label class="text-sm">حفظ تلقائي</label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="autoSaveToggle" class="sr-only peer" checked>
+                            <div
+                                class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                            </div>
+                        </label>
+                    </div>
+                    <input type="file" id="fileInput" accept=".json" class="hidden">
+                    <button id="loadBtn" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-upload ml-2"></i>
+                        تحميل ملف
+                    </button>
+                    <button id="addStageBtn"
+                        class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-plus ml-2"></i>
+                        إضافة مرحلة
+                    </button>
+                    <button id="exportBtn"
+                        class="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-download ml-2"></i>
+                        تصدير
+                    </button>
+                    <button id="saveBtn" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-save ml-2"></i>
+                        حفظ المشروع
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Notification Area -->
+    <div id="notificationArea" class="fixed top-20 right-4 z-50 space-y-2"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-4 rtl:space-x-reverse">
+            <div class="loading-spinner"></div>
+            <span class="text-gray-700">جاري التحميل...</span>
+        </div>
+    </div>
+
+    <!-- File Upload Area -->
+    <div id="uploadArea" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md mx-4 text-center file-drop-zone">
+            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+            <h3 class="text-lg font-semibold mb-2">اسحب وأفلت ملف JSON هنا</h3>
+            <p class="text-gray-600 mb-4">أو انقر لاختيار ملف</p>
+            <button onclick="document.getElementById('uploadArea').classList.add('hidden')"
+                class="text-gray-500 hover:text-gray-700">
+                إلغاء
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        <!-- Project Overview -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 id="projectName" class="text-2xl font-bold text-gray-800">مشروع ATM</h2>
+                <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                    <span class="text-sm text-gray-600">إجمالي الساعات:</span>
+                    <span id="totalHours" class="font-bold text-lg">97</span>
+                    <span class="text-sm text-gray-600">ساعة</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="text-center">
+                    <div class="text-sm text-gray-600 mb-1">إجمالي الأيام</div>
+                    <div id="totalDays" class="text-xl font-bold text-blue-600">20</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-sm text-gray-600 mb-1">ساعات يوميا</div>
+                    <div id="hoursPerDay" class="text-xl font-bold text-green-600">5</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-sm text-gray-600 mb-1">المهام المكتملة</div>
+                    <div>
+                        <span id="completedTasks" class="text-xl font-bold text-purple-600 completedTasks">0</span>
+                        <span class="text-sm text-gray-600">من</span>
+                        <span id="totalTasks" class="text-xl font-bold text-gray-600">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6">
+                <div class="flex justify-between text-sm mb-2">
+                    <span>التقدم الإجمالي</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                    <div id="progressBar"
+                        class="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+                        style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="flex justify-between text-sm mb-2">
+                    <span>تقدم الساعات</span>
+                    <span id="hoursProgressText">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                    <div id="hoursProgressBar"
+                        class="bg-gradient-to-r from-green-500 to-teal-600 h-3 rounded-full transition-all duration-500"
+                        style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage Navigation -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold">المراحل</h3>
+                <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                    <button id="prevStage" class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <span id="stageNumber" class="text-sm text-gray-600">1 من 5</span>
+                    <button id="nextStage" class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+            <div>
+                <h4 id="stageName" class="text-xl font-bold mb-2">المرحلة الأولى</h4>
+                <div class="flex justify-between text-sm mb-2">
+                    <span>تقدم المرحلة</span>
+                    <span id="stageProgress">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="stageProgressBar" class="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                        style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Stage List -->
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <h5 class="text-sm font-medium text-gray-700 mb-2">قائمة المراحل</h5>
+                <div id="stagesList" class="flex flex-wrap gap-2 mb-3">
+                    <!-- Stages will be loaded dynamically -->
+                </div>
+                <div id="stageActions" class="flex flex-wrap gap-2 mt-2">
+                    <!-- Stage actions will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Stage Tasks -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold">مهام المرحلة الحالية</h3>
+                <button id="addTaskBtn" onclick="addTaskToCurrentStage()"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-plus ml-2"></i>
+                    إضافة مهمة
+                </button>
+            </div>
+            <div id="tasksList" class="space-y-3">
+                <!-- Tasks will be loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Project Overview Cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Progress Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">التقدم الإجمالي</h3>
+                    <i class="fas fa-chart-pie text-primary text-xl"></i>
+                </div>
+                <div class="relative">
+                    <div class="text-3xl font-bold text-primary mb-2" id="totalProgress">0%</div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="bg-gradient-to-r from-primary to-secondary h-3 rounded-full transition-all duration-500"
+                            id="totalProgressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Hours Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">إجمالي الساعات</h3>
+                    <i class="fas fa-clock text-warning text-xl"></i>
+                </div>
+                <div class="text-3xl font-bold text-warning" id="totalHoursCard">97</div>
+                <div class="text-sm text-gray-600">ساعة عمل</div>
+            </div>
+
+            <!-- Completed Tasks Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">المهام المكتملة</h3>
+                    <i class="fas fa-check-circle text-success text-xl"></i>
+                </div>
+                <div class="text-3xl font-bold text-success completedTasks" id="completedTasksCard">0</div>
+                <div class="text-sm text-gray-600" id="totalTasksText">من 0 مهمة</div>
+            </div>
+
+            <!-- Days Remaining Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">الأيام المتبقية</h3>
+                    <i class="fas fa-calendar-alt text-danger text-xl"></i>
+                </div>
+                <div class="text-3xl font-bold text-danger" id="remainingDays">20</div>
+                <div class="text-sm text-gray-600">يوم عمل</div>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">نظرة عامة على المراحل</h3>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="overviewChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">الجدول الزمني</h3>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stages Container - Will be populated dynamically -->
+        <div id="stagesContainer" class="space-y-6 hidden">
+            <!-- Legacy stages container - now hidden -->
+        </div>
+    </main>
+
+    <!-- Add Stage Modal -->
+    <div id="addStageModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold" id="stageModalTitle">إضافة مرحلة جديدة</h3>
+                <button id="closeStageModal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addStageForm">
+                <input type="hidden" id="editStageId" value="">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">اسم المرحلة</label>
+                    <input type="text" id="stageName"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                        required>
+                </div>
+                <div class="flex justify-end space-x-3 rtl:space-x-reverse">
+                    <button type="button" id="cancelStageBtn"
+                        class="px-4 py-2 text-gray-600 hover:text-gray-800">إلغاء</button>
+                    <button type="submit" id="stageModalSubmitBtn"
+                        class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">إضافة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="addTaskModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold" id="taskModalTitle">إضافة مهمة جديدة</h3>
+                <button id="closeTaskModal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addTaskForm">
+                <input type="hidden" id="editTaskId" value="">
+                <input type="hidden" id="editTaskStageId" value="">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">اسم المهمة</label>
+                    <input type="text" id="taskName"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                        required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">عدد الساعات</label>
+                    <input type="number" id="taskHours"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                        required min="1">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
+                    <textarea id="taskDescription"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                        rows="3"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="taskCompleted" class="rounded text-primary focus:ring-primary mr-2">
+                        <span class="text-sm font-medium text-gray-700">مكتملة</span>
+                    </label>
+                </div>
+                <div class="flex justify-end space-x-3 rtl:space-x-reverse">
+                    <button type="button" id="cancelTaskBtn"
+                        class="px-4 py-2 text-gray-600 hover:text-gray-800">إلغاء</button>
+                    <button type="submit" id="taskModalSubmitBtn"
+                        class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">إضافة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirmDialog" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold" id="confirmDialogTitle">تأكيد العملية</h3>
+                <button id="closeConfirmDialog" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <p id="confirmDialogMessage" class="mb-4"></p>
+            <div class="flex justify-end space-x-3 rtl:space-x-reverse">
+                <button type="button" id="cancelConfirmBtn"
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800">إلغاء</button>
+                <button type="button" id="confirmBtn"
+                    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">تأكيد</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Project Management System Implementation
+        let projectData = null;
+        let currentStage = 0;
+        let charts = {};
+        let currentStageId = null;
+        let nextTaskId = 100;
+        let nextStageId = 100;
+        let autoSaveEnabled = true; // Enable auto-save by default
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeApp();
+        });
+
+        async function initializeApp() {
+            try {
+                // Try to load from localStorage first
+                if (loadSavedProject()) {
+                    console.log('Loaded project from localStorage');
+                } else {
+                    // If no saved project, load from project_data.json
+                    await loadDefaultProjectData();
+                    console.log('Loaded project from project_data.json');
+                }
+
+                setupEventListeners();
+                updateDisplay();
+                // Ensure the DOM is fully rendered before initializing charts
+                setTimeout(() => {
+                    try {
+                        updateCharts();
+                        console.log('Charts initialized successfully');
+                    } catch (chartError) {
+                        console.error('Error initializing charts:', chartError);
+                    }
+                }, 500);
+                showNotification('تم تحميل النظام بنجاح', 'success');
+            } catch (error) {
+                showNotification('خطأ في تحميل النظام: ' + error.message, 'error');
+                console.error('Initialization error:', error);
+            }
+        }
+
+        async function loadDefaultProjectData() {
+            try {
+                showLoading(true);
+                try {
+                    console.log('Attempting to load project_data.json...');
+                    const response = await fetch('project_data.json');
+                    if (!response.ok) {
+                        console.error('Failed to load project_data.json:', response.status, response.statusText);
+                        throw new Error(`Failed to load project data: ${response.status} ${response.statusText}`);
+                    }
+
+                    const text = await response.text();
+                    console.log('Received JSON text:', text.substring(0, 100) + '...');
+
+                    try {
+                        const data = JSON.parse(text);
+                        console.log('Successfully parsed JSON data:', data);
+
+                        // Convert the project data format using the new conversion function
+                        projectData = convertProjectData(data);
+                        console.log('Converted project data:', projectData);
+
+                        nextStageId = Math.max(...projectData.stages.map(s => s.id), 0) + 1;
+                        nextTaskId = Math.max(...projectData.stages.flatMap(s => s.tasks.map(t => t.id)), 0) + 1;
+                    } catch (parseError) {
+                        console.error('JSON parse error:', parseError);
+                        throw new Error(`Failed to parse JSON: ${parseError.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error loading default project data:', error);
+                    // Fallback to empty project structure with sample data
+                    projectData = createSampleProject();
+                    showNotification('تم إنشاء مشروع نموذجي', 'warning');
+                }
+
+                calculateProgress();
+                updateProjectInfo();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function createSampleProject() {
+            return {
+                name: "مشروع نموذجي",
+                nameEn: "Sample Project",
+                totalHours: 97,
+                totalDays: 20,
+                hoursPerDay: 5,
+                stages: [
+                    {
+                        id: 1,
+                        name: "المرحلة الأولى",
+                        nameEn: "First Stage",
+                        progress: 0,
+                        tasks: [
+                            {
+                                id: 1,
+                                name: "مهمة 1",
+                                nameEn: "Task 1",
+                                hours: 10,
+                                completed: false,
+                                description: "وصف المهمة الأولى"
+                            },
+                            {
+                                id: 2,
+                                name: "مهمة 2",
+                                nameEn: "Task 2",
+                                hours: 15,
+                                completed: false,
+                                description: "وصف المهمة الثانية"
+                            }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        name: "المرحلة الثانية",
+                        nameEn: "Second Stage",
+                        progress: 0,
+                        tasks: [
+                            {
+                                id: 3,
+                                name: "مهمة 3",
+                                nameEn: "Task 3",
+                                hours: 12,
+                                completed: false,
+                                description: "وصف المهمة الثالثة"
+                            }
+                        ]
+                    }
+                ]
+            };
+        }
+
+        function setupEventListeners() {
+            // File upload listeners
+            const fileInput = document.getElementById('fileInput');
+
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Button listeners
+            document.getElementById('loadBtn').addEventListener('click', () => fileInput.click());
+            document.getElementById('exportBtn').addEventListener('click', exportProject);
+            document.getElementById('saveBtn').addEventListener('click', saveProject);
+
+            // Stage navigation
+            document.getElementById('prevStage').addEventListener('click', () => navigateStage(-1));
+            document.getElementById('nextStage').addEventListener('click', () => navigateStage(1));
+
+            // Add Stage Modal
+            document.getElementById('addStageBtn').addEventListener('click', () => {
+                document.getElementById('addStageModal').classList.remove('hidden');
+                document.getElementById('addStageModal').classList.add('flex');
+                document.getElementById('stageModalTitle').textContent = 'إضافة مرحلة جديدة';
+                document.getElementById('stageModalSubmitBtn').textContent = 'إضافة';
+                document.getElementById('stageName').value = '';
+                document.getElementById('editStageId').value = '';
+            });
+
+            document.getElementById('closeStageModal').addEventListener('click', closeStageModal);
+            document.getElementById('cancelStageBtn').addEventListener('click', closeStageModal);
+
+            document.getElementById('addStageForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const stageId = document.getElementById('editStageId').value;
+                if (stageId) {
+                    updateStage(parseInt(stageId));
+                } else {
+                    addNewStage();
+                }
+            });
+
+            // Add Task Modal
+            document.getElementById('closeTaskModal').addEventListener('click', closeTaskModal);
+            document.getElementById('cancelTaskBtn').addEventListener('click', closeTaskModal);
+
+            document.getElementById('addTaskForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const taskId = document.getElementById('editTaskId').value;
+                const stageId = document.getElementById('editTaskStageId').value;
+
+                if (taskId && stageId) {
+                    updateTask(parseInt(stageId), parseInt(taskId));
+                } else {
+                    addNewTask();
+                }
+            });
+
+            // Close confirmation dialog
+            document.getElementById('cancelConfirmBtn').addEventListener('click', closeConfirmDialog);
+            document.getElementById('closeConfirmDialog').addEventListener('click', closeConfirmDialog);
+
+            // Auto-save toggle
+            document.getElementById('autoSaveToggle').addEventListener('change', function (e) {
+                autoSaveEnabled = e.target.checked;
+                showNotification(autoSaveEnabled ? 'تم تفعيل الحفظ التلقائي' : 'تم إيقاف الحفظ التلقائي', 'info');
+            });
+        }
+
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Check if file has a .json extension or JSON MIME type
+            const isJsonFile = file.name.toLowerCase().endsWith('.json') ||
+                file.type === 'application/json' ||
+                file.type === 'text/json' ||
+                file.type === 'text/plain';
+
+            if (!isJsonFile) {
+                showNotification('يرجى اختيار ملف JSON صحيح', 'error');
+                return;
+            }
+
+            try {
+                showLoading(true);
+                console.log('Reading uploaded file:', file.name, file.type, file.size);
+
+                const text = await file.text();
+                console.log('File content preview:', text.substring(0, 100) + '...');
+
+                try {
+                    const data = JSON.parse(text);
+                    console.log('Parsed uploaded JSON:', data);
+
+                    if (validateProjectData(data)) {
+                        // Convert the data format if needed
+                        projectData = convertProjectData(data);
+                        console.log('Converted uploaded project data:', projectData);
+
+                        calculateProgress();
+                        updateCharts();
+                        updateProjectInfo();
+                        updateDisplay();
+                        showNotification('تم تحميل المشروع بنجاح', 'success');
+                    } else {
+                        console.error('Invalid project data structure:', data);
+                        showNotification('صيغة ملف المشروع غير صحيحة', 'error');
+                    }
+                } catch (parseError) {
+                    console.error('Error parsing uploaded JSON:', parseError);
+                    showNotification('خطأ في تحليل ملف JSON: ' + parseError.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error processing file:', error);
+                showNotification('خطأ في قراءة الملف: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function validateProjectData(data) {
+            // Check if data has project info or stages
+            return data &&
+                (data.project || data.name || data.stages ||
+                    (data.project && data.project.name) ||
+                    (data.stages && Array.isArray(data.stages)));
+        }
+
+        function convertProjectData(data) {
+            // Handle different possible JSON structures
+            let convertedData = {
+                name: "مشروع ATM",
+                nameEn: "ATM Project",
+                totalHours: 0,
+                totalDays: 0,
+                hoursPerDay: 5,
+                stages: []
+            };
+
+            // If data has project property (like in project_data.json)
+            if (data.project) {
+                convertedData.name = data.project.name || "مشروع ATM";
+                convertedData.nameEn = data.project.nameEn || "ATM Project";
+                convertedData.totalHours = data.project.totalEstimatedHours || 0;
+                convertedData.totalDays = data.project.totalEstimatedDays || 0;
+                convertedData.hoursPerDay = data.project.hoursPerDay || 5;
+            } else {
+                // Direct properties
+                convertedData.name = data.name || "مشروع ATM";
+                convertedData.nameEn = data.nameEn || "ATM Project";
+                convertedData.totalHours = data.totalHours || 0;
+                convertedData.totalDays = data.totalDays || 0;
+                convertedData.hoursPerDay = data.hoursPerDay || 5;
+            }
+
+            // Process stages
+            if (data.stages && Array.isArray(data.stages)) {
+                convertedData.stages = data.stages.map((stage, index) => ({
+                    id: stage.id || index + 1,
+                    name: stage.name || `المرحلة ${index + 1}`,
+                    nameEn: stage.nameEn || `Stage ${index + 1}`,
+                    progress: stage.progress || 0,
+                    tasks: Array.isArray(stage.tasks) ? stage.tasks.map((task, taskIndex) => ({
+                        id: task.id || taskIndex + 1,
+                        name: task.name || `مهمة ${taskIndex + 1}`,
+                        nameEn: task.nameEn || `Task ${taskIndex + 1}`,
+                        hours: task.hours || 0,
+                        completed: task.completed || false,
+                        description: task.description || ""
+                    })) : []
+                }));
+            }
+
+            return convertedData;
+        }
+
+        function calculateProgress() {
+            if (!projectData || !projectData.stages) return;
+
+            let totalTasks = 0;
+            let completedTasks = 0;
+            let totalHours = 0;
+            let completedHours = 0;
+
+            projectData.stages.forEach(stage => {
+                if (stage.tasks && Array.isArray(stage.tasks)) {
+                    stage.tasks.forEach(task => {
+                        totalTasks++;
+                        totalHours += task.hours || 0;
+
+                        if (task.completed) {
+                            completedTasks++;
+                            completedHours += task.hours || 0;
+                        }
+                    });
+                }
+
+                // Calculate stage progress
+                const stageTasks = stage.tasks ? stage.tasks.length : 0;
+                const stageCompleted = stage.tasks ? stage.tasks.filter(t => t.completed).length : 0;
+                stage.progress = stageTasks > 0 ? (stageCompleted / stageTasks) * 100 : 0;
+            });
+
+            // Update project totals
+            projectData.totalTasks = totalTasks;
+            projectData.completedTasks = completedTasks;
+            projectData.totalHours = totalHours;
+            projectData.completedHours = completedHours;
+            projectData.progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+            projectData.hoursProgress = totalHours > 0 ? (completedHours / totalHours) * 100 : 0;
+        }
+
+        function updateDisplay() {
+            updateProjectInfo();
+            updateStageDisplay();
+            updateTasksList();
+            updateCharts();
+        }
+
+        function updateProjectInfo() {
+            if (!projectData) return;
+
+            document.getElementById('projectName').textContent = projectData.name || 'مشروع جديد';
+
+            // Update total hours in all locations
+            const totalHours = projectData.totalHours || 0;
+            document.getElementById('totalHours').textContent = totalHours;
+            document.getElementById('totalHoursCard').textContent = totalHours;
+
+            document.getElementById('totalDays').textContent = projectData.totalDays || 0;
+            document.getElementById('hoursPerDay').textContent = projectData.hoursPerDay || 5;
+
+            // Update progress bars
+            const progress = projectData.progress || 0;
+            const hoursProgress = projectData.hoursProgress || 0;
+
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = Math.round(progress) + '%';
+
+            document.getElementById('hoursProgressBar').style.width = hoursProgress + '%';
+            document.getElementById('hoursProgressText').textContent = Math.round(hoursProgress) + '%';
+
+            // Update task counts
+            const completedTasks = projectData.completedTasks || 0;
+            const totalTasks = projectData.totalTasks || 0;
+
+            // Update all elements with completedTasks class
+            document.querySelectorAll('.completedTasks').forEach(el => {
+                el.textContent = completedTasks;
+            });
+
+            document.getElementById('totalTasks').textContent = totalTasks;
+            document.getElementById('totalTasksText').textContent = `من ${totalTasks} مهمة`;
+
+            // Update overall progress card
+            const roundedProgress = Math.round(progress);
+            document.getElementById('totalProgress').textContent = roundedProgress + '%';
+            document.getElementById('totalProgressBar').style.width = progress + '%';
+
+            // Calculate remaining days
+            const remainingHours = totalHours - (projectData.completedHours || 0);
+            const remainingDays = Math.ceil(remainingHours / (projectData.hoursPerDay || 5));
+            document.getElementById('remainingDays').textContent = remainingDays;
+        }
+
+        function updateStageDisplay() {
+            if (!projectData || !projectData.stages || projectData.stages.length === 0) {
+                document.getElementById('stageName').textContent = 'لا توجد مراحل';
+                document.getElementById('stageProgress').textContent = '0%';
+                document.getElementById('stageNumber').textContent = '0 من 0';
+                document.getElementById('stageProgressBar').style.width = '0%';
+                document.getElementById('stagesList').innerHTML = '';
+                document.getElementById('stageActions').innerHTML = '';
+                return;
+            }
+
+            const stage = projectData.stages[currentStage];
+            if (!stage) return;
+
+            document.getElementById('stageName').textContent = stage.name || `المرحلة ${currentStage + 1}`;
+            document.getElementById('stageProgress').textContent = Math.round(stage.progress || 0) + '%';
+            document.getElementById('stageNumber').textContent = `${currentStage + 1} من ${projectData.stages.length}`;
+            document.getElementById('stageProgressBar').style.width = (stage.progress || 0) + '%';
+
+            // Update navigation buttons
+            document.getElementById('prevStage').disabled = currentStage === 0;
+            document.getElementById('nextStage').disabled = currentStage === projectData.stages.length - 1;
+
+            // Update the stages list
+            const stagesList = document.getElementById('stagesList');
+            if (stagesList) {
+                stagesList.innerHTML = projectData.stages.map((s, idx) => `
+                    <button
+                        onclick="navigateToStage(${idx})"
+                        class="px-3 py-1 text-sm rounded-full ${idx === currentStage
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
+                    >
+                        ${s.name || `المرحلة ${idx + 1}`}
+                    </button>
+                `).join('');
+            }
+
+            // Update stage actions
+            const stageActions = document.getElementById('stageActions');
+            if (stageActions && stage) {
+                stageActions.innerHTML = `
+                    <button onclick="editStage(${stage.id})" class="flex items-center gap-1 px-3 py-1 text-sm rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200">
+                        <i class="fas fa-edit"></i>
+                        تعديل المرحلة
+                    </button>
+                    <button onclick="deleteStage(${stage.id})" class="flex items-center gap-1 px-3 py-1 text-sm rounded-lg bg-red-100 text-red-700 hover:bg-red-200">
+                        <i class="fas fa-trash"></i>
+                        حذف المرحلة
+                    </button>
+                `;
+            }
+        }
+
+        function navigateToStage(stageIndex) {
+            if (stageIndex >= 0 && stageIndex < projectData.stages.length) {
+                currentStage = stageIndex;
+                updateDisplay();
+            }
+        }
+
+        function updateTasksList() {
+            const tasksList = document.getElementById('tasksList');
+            if (!tasksList || !projectData || !projectData.stages) return;
+
+            const stage = projectData.stages[currentStage];
+            if (!stage || !stage.tasks) {
+                tasksList.innerHTML = '<div class="text-center text-gray-500 py-8">لا توجد مهام في هذه المرحلة</div>';
+                return;
+            }
+
+            tasksList.innerHTML = stage.tasks.map((task, index) => `
+                <div class="task-item ${task.completed ? 'completed' : ''} border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors ${task.completed ? 'bg-green-50 border-green-200' : ''}" data-task-index="${index}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox"
+                                   ${task.completed ? 'checked' : ''}
+                                   onchange="toggleTask(${index})"
+                                   class="w-5 h-5 text-blue-600 rounded">
+                            <div>
+                                <h4 class="font-medium ${task.completed ? 'line-through text-gray-500' : ''}">${task.name || `مهمة ${index + 1}`}</h4>
+                                ${task.description ? `<p class="text-sm text-gray-600 mt-1">${task.description}</p>` : ''}
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                        <i class="fas fa-clock ml-1"></i>
+                                        ${task.hours || 0} ساعة
+                                    </span>
+                                    ${task.completed ? '<span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded"><i class="fas fa-check ml-1"></i>مكتمل</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="editTask(${stage.id}, ${task.id})" class="text-gray-400 hover:text-blue-500 transition-colors p-1">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteTask(${stage.id}, ${task.id})" class="text-gray-400 hover:text-red-500 transition-colors p-1">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleTask(taskIndex) {
+            if (!projectData || !projectData.stages || !projectData.stages[currentStage]) return;
+
+            const task = projectData.stages[currentStage].tasks[taskIndex];
+            if (task) {
+                task.completed = !task.completed;
+                calculateProgress();
+                updateDisplay();
+                autoSaveChanges();
+
+                const status = task.completed ? 'مكتملة' : 'غير مكتملة';
+                showNotification(`تم تحديث حالة المهمة: ${status}`, 'success');
+            }
+        }
+
+        function navigateStage(direction) {
+            const newStage = currentStage + direction;
+            if (newStage >= 0 && newStage < projectData.stages.length) {
+                currentStage = newStage;
+                updateDisplay();
+            }
+        }
+
+        function updateCharts() {
+            try {
+                updateOverviewChart();
+                updateTimelineChart();
+            } catch (error) {
+                console.error('Error updating charts:', error);
+                showNotification('خطأ في تحديث الرسوم البيانية', 'error');
+            }
+        }
+
+        function updateOverviewChart() {
+            const ctx = document.getElementById('overviewChart');
+            if (!ctx || !ctx.getContext) {
+                console.error('Overview chart canvas not available');
+                return;
+            }
+
+            // Destroy existing chart
+            if (charts.overview) {
+                charts.overview.destroy();
+            }
+
+            const stageLabels = projectData && projectData.stages ? projectData.stages.map(s => s.name || 'مرحلة') : [];
+            const stageProgress = projectData && projectData.stages ? projectData.stages.map(s => s.progress || 0) : [];
+
+            // If no data, provide a placeholder
+            if (stageLabels.length === 0) {
+                stageLabels.push('لا توجد مراحل');
+                stageProgress.push(100);
+            }
+
+            charts.overview = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: stageLabels,
+                    datasets: [{
+                        data: stageProgress,
+                        backgroundColor: [
+                            '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
+                            '#EC4899', '#14B8A6', '#F97316', '#6366F1', '#84CC16'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTimelineChart() {
+            const ctx = document.getElementById('timelineChart');
+            if (!ctx || !ctx.getContext) {
+                console.error('Timeline chart canvas not available');
+                return;
+            }
+
+            // Destroy existing chart
+            if (charts.timeline) {
+                charts.timeline.destroy();
+            }
+
+            const stageLabels = projectData && projectData.stages ? projectData.stages.map(s => s.name || 'مرحلة') : [];
+            const stageHours = projectData && projectData.stages ? projectData.stages.map(stage => {
+                return stage.tasks ? stage.tasks.reduce((sum, task) => sum + (task.hours || 0), 0) : 0;
+            }) : [];
+
+            // If no data, provide a placeholder
+            if (stageLabels.length === 0) {
+                stageLabels.push('لا توجد مراحل');
+                stageHours.push(0);
+            }
+
+            charts.timeline = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: stageLabels,
+                    datasets: [{
+                        label: 'الساعات المطلوبة',
+                        data: stageHours,
+                        backgroundColor: '#3B82F6',
+                        borderColor: '#2563EB',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'الساعات'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        function addNewStage() {
+            const name = document.getElementById('stageName').value;
+
+            projectData.stages.push({
+                id: nextStageId++,
+                name: name,
+                progress: 0,
+                tasks: []
+            });
+
+            closeStageModal();
+            calculateProgress();
+            updateDisplay();
+            autoSaveChanges();
+            showNotification('تم إضافة المرحلة بنجاح', 'success');
+        }
+
+        function updateStage(stageId) {
+            const name = document.getElementById('stageName').value;
+            const stage = projectData.stages.find(s => s.id === stageId);
+
+            if (stage) {
+                stage.name = name;
+                closeStageModal();
+                calculateProgress();
+                updateDisplay();
+                autoSaveChanges();
+                showNotification('تم تحديث المرحلة بنجاح', 'success');
+            }
+        }
+
+        function editStage(stageId) {
+            const stage = projectData.stages.find(s => s.id === stageId);
+            if (stage) {
+                document.getElementById('stageModalTitle').textContent = 'تعديل المرحلة';
+                document.getElementById('stageModalSubmitBtn').textContent = 'تحديث';
+                document.getElementById('stageName').value = stage.name;
+                document.getElementById('editStageId').value = stageId;
+
+                document.getElementById('addStageModal').classList.remove('hidden');
+                document.getElementById('addStageModal').classList.add('flex');
+            }
+        }
+
+        function deleteStage(stageId) {
+            showConfirmDialog(
+                'حذف المرحلة',
+                'هل أنت متأكد من حذف هذه المرحلة؟ سيتم حذف جميع المهام المرتبطة بها.',
+                () => {
+                    projectData.stages = projectData.stages.filter(s => s.id !== stageId);
+                    if (currentStage >= projectData.stages.length) {
+                        currentStage = Math.max(0, projectData.stages.length - 1);
+                    }
+                    calculateProgress();
+                    updateDisplay();
+                    autoSaveChanges();
+                    showNotification('تم حذف المرحلة', 'success');
+                }
+            );
+        }
+
+        function deleteTask(stageId, taskId) {
+            showConfirmDialog(
+                'حذف المهمة',
+                'هل أنت متأكد من حذف هذه المهمة؟',
+                () => {
+                    const stage = projectData.stages.find(s => s.id === stageId);
+                    if (stage) {
+                        stage.tasks = stage.tasks.filter(t => t.id !== taskId);
+                        calculateProgress();
+                        updateDisplay();
+                        autoSaveChanges();
+                        showNotification('تم حذف المهمة', 'success');
+                    }
+                }
+            );
+        }
+
+        function addNewTask() {
+            const name = document.getElementById('taskName').value;
+            const hours = parseInt(document.getElementById('taskHours').value);
+            const description = document.getElementById('taskDescription').value;
+            const completed = document.getElementById('taskCompleted').checked;
+
+            const stage = projectData.stages.find(s => s.id === currentStageId);
+            if (stage) {
+                stage.tasks.push({
+                    id: nextTaskId++,
+                    name: name,
+                    hours: hours,
+                    completed: completed,
+                    description: description
+                });
+
+                closeTaskModal();
+                calculateProgress();
+                updateDisplay();
+                autoSaveChanges();
+                showNotification('تم إضافة المهمة بنجاح', 'success');
+            }
+        }
+
+        function editTask(stageId, taskId) {
+            const stage = projectData.stages.find(s => s.id === stageId);
+            if (!stage) return;
+
+            const task = stage.tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            // Set the form values
+            document.getElementById('taskModalTitle').textContent = 'تعديل المهمة';
+            document.getElementById('taskModalSubmitBtn').textContent = 'تحديث';
+            document.getElementById('taskName').value = task.name || '';
+            document.getElementById('taskHours').value = task.hours || '';
+            document.getElementById('taskDescription').value = task.description || '';
+            document.getElementById('taskCompleted').checked = task.completed || false;
+            document.getElementById('editTaskId').value = taskId;
+            document.getElementById('editTaskStageId').value = stageId;
+
+            // Show the modal
+            document.getElementById('addTaskModal').classList.remove('hidden');
+            document.getElementById('addTaskModal').classList.add('flex');
+        }
+
+        function updateTask(stageId, taskId) {
+            const stage = projectData.stages.find(s => s.id === stageId);
+            if (!stage) return;
+
+            const task = stage.tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            // Update task properties
+            task.name = document.getElementById('taskName').value;
+            task.hours = parseInt(document.getElementById('taskHours').value);
+            task.description = document.getElementById('taskDescription').value;
+            task.completed = document.getElementById('taskCompleted').checked;
+
+            closeTaskModal();
+            calculateProgress();
+            updateDisplay();
+            autoSaveChanges();
+            showNotification('تم تحديث المهمة بنجاح', 'success');
+        }
+
+        function closeStageModal() {
+            document.getElementById('addStageModal').classList.add('hidden');
+            document.getElementById('addStageModal').classList.remove('flex');
+            document.getElementById('stageName').value = '';
+            document.getElementById('editStageId').value = '';
+        }
+
+        function closeTaskModal() {
+            document.getElementById('addTaskModal').classList.add('hidden');
+            document.getElementById('addTaskModal').classList.remove('flex');
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskHours').value = '';
+            document.getElementById('taskDescription').value = '';
+            document.getElementById('taskCompleted').checked = false;
+            document.getElementById('editTaskId').value = '';
+            document.getElementById('editTaskStageId').value = '';
+            currentStageId = null;
+        }
+
+        function exportProject() {
+            if (!projectData) {
+                showNotification('لا يوجد مشروع للتصدير', 'warning');
+                return;
+            }
+
+            try {
+                const exportFormat = {
+                    project: {
+                        name: projectData.name,
+                        totalEstimatedHours: projectData.totalHours,
+                        totalEstimatedDays: projectData.totalDays,
+                        hoursPerDay: projectData.hoursPerDay,
+                        createdAt: new Date().toISOString().split('T')[0],
+                        lastUpdated: new Date().toISOString().split('T')[0]
+                    },
+                    stages: projectData.stages.map(stage => ({
+                        id: stage.id,
+                        name: stage.name,
+                        nameEn: stage.nameEn || stage.name,
+                        order: stage.id,
+                        progress: stage.progress,
+                        tasks: stage.tasks.map(task => ({
+                            id: task.id,
+                            name: task.name,
+                            nameEn: task.nameEn || task.name,
+                            hours: task.hours,
+                            completed: task.completed,
+                            order: task.id,
+                            description: task.description || ""
+                        }))
+                    }))
+                };
+
+                const dataStr = JSON.stringify(exportFormat, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `${projectData.name || 'project'}_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+
+                showNotification('تم تصدير المشروع بنجاح', 'success');
+            } catch (error) {
+                showNotification('خطأ في تصدير المشروع: ' + error.message, 'error');
+            }
+        }
+
+        function saveProject() {
+            if (!projectData) {
+                showNotification('لا يوجد مشروع للحفظ', 'warning');
+                return;
+            }
+
+            try {
+                localStorage.setItem('savedProject', JSON.stringify(projectData));
+
+                // Also offer to download the file
+                showConfirmDialog(
+                    'حفظ المشروع',
+                    'تم حفظ المشروع محلياً. هل ترغب في تنزيل نسخة من الملف؟',
+                    exportProject
+                );
+
+                showNotification('تم حفظ المشروع محلياً', 'success');
+            } catch (error) {
+                showNotification('خطأ في حفظ المشروع: ' + error.message, 'error');
+            }
+        }
+
+        function loadSavedProject() {
+            try {
+                const saved = localStorage.getItem('savedProject');
+                if (saved) {
+                    projectData = JSON.parse(saved);
+
+                    // Update IDs for next items
+                    if (projectData.stages && projectData.stages.length > 0) {
+                        nextStageId = Math.max(...projectData.stages.map(s => s.id), 0) + 1;
+
+                        if (projectData.stages.some(s => s.tasks && s.tasks.length > 0)) {
+                            nextTaskId = Math.max(...projectData.stages.flatMap(s => s.tasks.map(t => t.id)), 0) + 1;
+                        }
+                    }
+
+                    calculateProgress();
+                    console.log('Successfully loaded saved project from localStorage');
+                    return true;
+                }
+            } catch (error) {
+                console.error('Error loading saved project:', error);
+            }
+            return false;
+        }
+
+        // Auto-save function
+        function autoSaveChanges() {
+            if (autoSaveEnabled && projectData) {
+                try {
+                    localStorage.setItem('savedProject', JSON.stringify(projectData));
+                    console.log('Project auto-saved');
+                } catch (error) {
+                    console.error('Error auto-saving project:', error);
+                }
+            }
+        }
+
+        // Confirmation Dialog
+        function showConfirmDialog(title, message, confirmCallback) {
+            document.getElementById('confirmDialogTitle').textContent = title;
+            document.getElementById('confirmDialogMessage').textContent = message;
+
+            const confirmDialog = document.getElementById('confirmDialog');
+            confirmDialog.classList.remove('hidden');
+            confirmDialog.classList.add('flex');
+
+            document.getElementById('confirmBtn').onclick = () => {
+                confirmCallback();
+                closeConfirmDialog();
+            };
+        }
+
+        function closeConfirmDialog() {
+            const confirmDialog = document.getElementById('confirmDialog');
+            confirmDialog.classList.add('hidden');
+            confirmDialog.classList.remove('flex');
+        }
+
+        // Utility functions
+        function showNotification(message, type = 'info') {
+            const notificationArea = document.getElementById('notificationArea');
+            const notification = document.createElement('div');
+
+            const bgColor = {
+                success: 'bg-green-100 border-green-400 text-green-700',
+                error: 'bg-red-100 border-red-400 text-red-700',
+                warning: 'bg-yellow-100 border-yellow-400 text-yellow-700',
+                info: 'bg-blue-100 border-blue-400 text-blue-700'
+            };
+
+            notification.className = `${bgColor[type]} border px-4 py-3 rounded relative mb-2 animate-fade-in`;
+            notification.innerHTML = `
+                <span class="block sm:inline">${message}</span>
+                <span class="absolute top-0 bottom-0 left-0 px-4 py-3">
+                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-gray-500 cursor-pointer" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+                    </svg>
+                </span>
+            `;
+
+            notificationArea.appendChild(notification);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                if (show) {
+                    overlay.classList.remove('hidden');
+                    overlay.classList.add('flex');
+                } else {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                }
+            }
+        }
+
+        function addTaskToStage(stageId) {
+            currentStageId = stageId;
+
+            // Reset the task form for a new task
+            document.getElementById('taskModalTitle').textContent = 'إضافة مهمة جديدة';
+            document.getElementById('taskModalSubmitBtn').textContent = 'إضافة';
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskHours').value = '';
+            document.getElementById('taskDescription').value = '';
+            document.getElementById('taskCompleted').checked = false;
+            document.getElementById('editTaskId').value = '';
+            document.getElementById('editTaskStageId').value = '';
+
+            document.getElementById('addTaskModal').classList.remove('hidden');
+            document.getElementById('addTaskModal').classList.add('flex');
+        }
+
+        function addTaskToCurrentStage() {
+            if (projectData && projectData.stages && projectData.stages[currentStage]) {
+                currentStageId = projectData.stages[currentStage].id;
+
+                // Reset the task form for a new task
+                document.getElementById('taskModalTitle').textContent = 'إضافة مهمة جديدة';
+                document.getElementById('taskModalSubmitBtn').textContent = 'إضافة';
+                document.getElementById('taskName').value = '';
+                document.getElementById('taskHours').value = '';
+                document.getElementById('taskDescription').value = '';
+                document.getElementById('taskCompleted').checked = false;
+                document.getElementById('editTaskId').value = '';
+                document.getElementById('editTaskStageId').value = '';
+
+                document.getElementById('addTaskModal').classList.remove('hidden');
+                document.getElementById('addTaskModal').classList.add('flex');
+            } else {
+                showNotification('لا توجد مرحلة نشطة لإضافة مهام إليها', 'warning');
+            }
+        }
+    </script>
+</body>
+
+</html>
