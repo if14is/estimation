@@ -1,372 +1,435 @@
 {
-    "project": {
-        "name": "ATM Project Management System",
-        "totalEstimatedHours": 110,
-        "totalEstimatedDays": 20,
-        "hoursPerDay": 5,
-        "createdAt": "2025-06-15",
-        "lastUpdated": "2025-06-15"
-    },
-    "stages": [
+  "project": {
+    "name": "ATM Project Management System",
+    "totalEstimatedHours": 135,
+    "totalEstimatedDays": 20,
+    "hoursPerDay": 5,
+    "createdAt": "2025-06-30",
+    "lastUpdated": "2025-06-30"
+  },
+  "stages": [
+    {
+      "id": 1,
+      "name": "المرحلة الأولى: إعداد المشروع والبيئة",
+      "nameEn": "Project Setup & Environment",
+      "order": 1,
+      "progress": 100,
+      "tasks": [
         {
-            "id": 1,
-            "name": "المرحلة الأولى: إعداد المشروع والبيئة",
-            "nameEn": "Project Setup & Environment",
-            "order": 1,
-            "progress": 100,
-            "tasks": [
-                {
-                    "id": 1,
-                    "name": "تهيئة مشروع Laravel جديد",
-                    "nameEn": "Laravel Project Setup",
-                    "hours": 2,
-                    "completed": true,
-                    "order": 1,
-                    "description": "إنشاء مشروع Laravel إصدار 12. تثبيت الاعتماديات الأساسية (Dependencies). إعداد ملفات البيئة (.env) للإعدادات المحلية والإنتاجية (قاعدة البيانات، البريد، مفاتيح API، إلخ)."
-                },
-                {
-                    "id": 2,
-                    "name": "إعداد قاعدة البيانات",
-                    "nameEn": "Database Setup",
-                    "hours": 10,
-                    "completed": true,
-                    "order": 2,
-                    "description": "تصميم مخطط قاعدة البيانات (Schema) ليشمل جميع الجداول المطلوبة (Users, Patients, Doctors, Labs, Appointments, Treatments, Payments, Notifications, etc.). إنشاء ملفات (Migrations) لجميع الجداول. إنشاء ملفات (Seeders) للبيانات الأولية (مثل أنواع المستخدمين، الحالات الافتراضية)."
-                },
-                {
-                    "id": 3,
-                    "name": "إعداد نظام المصادقة",
-                    "nameEn": "Authentication System Setup",
-                    "hours": 4,
-                    "completed": true,
-                    "order": 3,
-                    "description": "تكوين نظام المصادقة باستخدام Laravel Sanctum  لدعم API Tokens لتطبيق الموبايل. تطبيق نظام (Roles & Permissions) للتحكم في وصول المستخدمين المختلفين (Patient, Doctor, Lab, Admin, Doctor/Lab Outside Egypt)."
-                }
-            ]
+          "id": 1,
+          "name": "تهيئة مشروع Laravel جديد",
+          "nameEn": "Laravel Project Setup",
+          "hours": 2,
+          "completed": true,
+          "order": 1,
+          "description": "إنشاء مشروع Laravel إصدار 12. تثبيت الاعتماديات الأساسية (Dependencies). إعداد ملفات البيئة (.env) للإعدادات المحلية والإنتاجية (قاعدة البيانات، البريد، مفاتيح API، إلخ)."
         },
         {
-            "id": 2,
-            "name": "المرحلة الثانية: تطوير الواجهة البرمجية للتطبيق",
-            "nameEn": "API Development",
-            "order": 2,
-            "progress": 30,
-            "tasks": [
-                {
-                    "id": 4,
-                    "name": "API تسجيل الدخول/الخروج",
-                    "nameEn": "Login/Logout API",
-                    "hours": 2,
-                    "completed": true,
-                    "order": 4,
-                    "description": "إنشاء Endpoints لتسجيل دخول المستخدمين (Patient, Doctor, Lab, Doctor/Lab Outside Egypt) باستخدام بيانات الاعتماد المناسبة (بريد إلكتروني وكلمة مرور). إنشاء Endpoint لتسجيل الخروج وحذف Token."
-                },
-                {
-                    "id": 5,
-                    "name": "API إنشاء حساب جديد",
-                    "nameEn": "Registration API",
-                    "hours": 4,
-                    "completed": true,
-                    "order": 5,
-                    "description": "إنشاء Endpoints لإنشاء حسابات [Patient - Doctor -Lab Internal provider (Lab - Doctor)] جديدة لكل نوع مستخدم (مع التحقق من صحة البيانات). تطبيق آلية التحقق عبر  Email للمرضى (يتطلب تكامل مع خدمة  (OTP)Email Gateway). تطبيق آلية انتظار الموافقة لحسابات المعامل والأطباء."
-                },
-                {
-                    "id": 6,
-                    "name": "API استعادة كلمة المرور",
-                    "nameEn": "Password Recovery API",
-                    "hours": 1,
-                    "completed": true,
-                    "order": 6,
-                    "description": "إنشاء Endpoints لطلب إعادة تعيين كلمة المرور وإرسال رمز عبر البريد الإلكتروني. إنشاء Endpoint لتحديث كلمة المرور."
-                },
-                {
-                    "id": 7,
-                    "name": "API إدارة الملف الشخصي",
-                    "nameEn": "Profile Management API",
-                    "hours": 1,
-                    "completed": true,
-                    "order": 7,
-                    "description": "إنشاء Endpoint لعرض بيانات الحساب\nانشاء Endpointلتحديث بيانات الملف الشخصي لكل نوع مستخدم.\n إنشاء Endpoint لحذف الحساب.\n إنشاء Endpoint لتسجيل الخروج وحذف Token.\nانشاء   للحساب Endpoint  Deactivate"
-                },
-                {
-                    "id": 8,
-                    "name": "API لوحة التحكم الرئيسية للمريض",
-                    "nameEn": "Patient Dashboard API",
-                    "hours": 3,
-                    "completed": true,
-                    "order": 8,
-                    "description": "إنشاء Endpoint لعرض بيانات لوحة التحكم (الترحيب، الموعد القادم، موقع العيادة علي الخريطة و ايضا مكانها نصيا).\n هناك seleders لعرض معلومات عباره عن صوره و title و description -time duration - Url link  \nانشاء CRUD Slider يتم التحكم فيهم من خلال الادمن بانل عن طريق ادخال البيانات المطلوبة  و التعديل عليها و حزفها او ايقاف تشغيلها"
-                },
-                {
-                    "id": 9,
-                    "name": "API حجز المواعيد",
-                    "nameEn": "Appointment Booking API",
-                    "hours": 2,
-                    "completed": true,
-                    "order": 9,
-                    "description": "إنشاء Endpoint لعرض المواعيد المتاحة في التقويم. إنشاء Endpoint لحجز موعد جديد وتأكيده."
-                },
-                {
-                    "id": 10,
-                    "name": "API الدفع (للمريض)",
-                    "nameEn": "Patient Payment API",
-                    "hours": 4,
-                    "completed": false,
-                    "order": 10,
-                    "description": "إنشاء Endpoints لبدء عملية الدفع (للحجز أو الأقساط) وتوليد رابط/معلومات بوابة الدفع. إنشاء Endpoint لمعالجة ردود بوابة الدفع (Webhook/Callback) وتحديث حالة الدفع. إنشاء Endpoint لعرض سجل الدفع للمريض. (الميعاد و المبلغ)"
-                },
-                {
-                    "id": 11,
-                    "name": "لوحة تحكم المريض",
-                    "nameEn": "Patient Control Panel",
-                    "hours": 5,
-                    "completed": false,
-                    "order": 11,
-                    "description": "إنشاء Endpoint لعرض سجل زيارات المريض. (التاريخ و الزيارة)\nإنشاء Endpoint لعرض تفاصيل الفحص الأولي.\nإنشاء Endpoint لطلب خطة علاج و بعد قبولها من لوحه التحكم يتم بعدها.\nإنشاء Endpoint لعرض خطة العلاج التي تم انشائها من الداشبورد للمريض وتفاصيل الأقساط. (فيديو لشرح خطة العلاج يتم رفعه و تفاصيل خطة العلاج ( اسم الخطة: تقويم الأسنان التجميلي مدة العلاج: 6 أشهر الطبيب المشرف: د. أحمد العتيبي ال [master doctor] ) و القسط التالي) - التكلفة الاجمالية - جدول اقساط التقويم (القسط - الميعاد - المبلغ).\nإنشاء Endpoint لقبول خطة العلاج  (يتم انشائها لكي يتمكن المريض من الاطلاع علي خطه العلاج و لاتكلفه و كل معلومات الاقساط و من بعدها يمكن ان يقبل خطه العلاج او يرفضها او يتم التفاوض فيها من خلال كتابه تفسير للتفاوض من خلال الاتي ).\nإنشاء Endpoint لطلب تعديل خطة العلاج. \nإنشاء Endpoint لعرض حالة متابعة العلاج والأقساط.(موعد زيارة العيادة لاستلام التقويم - جدول تركيب التقويم للمريض (مكان التركيب -الميعاد -التقويم - امكانية حجز الموعد المحدد) - القسط التالي (القسط - الميعاد - المبلغ) - حالة القسط (مدفوع - غير مدفوع)).\n إنشاء Endpoint لتنزيل التقارير الطبية (PDF Generation)."
-                },
-                {
-                    "id": 12,
-                    "name": "API لوحة التحكم الرئيسية للطبيب",
-                    "nameEn": "Doctor Dashboard API",
-                    "hours": 2,
-                    "completed": false,
-                    "order": 12,
-                    "description": "إنشاء Endpoint لعرض قائمة مرضى الطبيب. إنشاء Endpoint لعرض خيارات خطة العلاج والمتابعة بعد موافقة المريض."
-                },
-                {
-                    "id": 13,
-                    "name": "API إدارة المرضى (للطبيب)",
-                    "nameEn": "Doctor Patient Management API",
-                    "hours": 2,
-                    "completed": false,
-                    "order": 13,
-                    "description": "إنشاء Endpoint لإضافة مريض جديد ورفع ملفاته (صور، أشعة). [اسم المريض -رفع صور الفم الداخلية-رفع صور الوجه الخارجية-رفع أشعة بانورامية- رفع الأشعة الجانبية -رفع المسح الرقمي للأسنان- دفع رسوم الخطة ]"
-                },
-                {
-                    "id": 14,
-                    "name": "API خطة العلاج (للطبيب)",
-                    "nameEn": "Doctor Treatment Plan API",
-                    "hours": 3,
-                    "completed": false,
-                    "order": 14,
-                    "description": "إنشاء Endpoint لإعداد/تعديل خطة العلاج للمريض (بما في ذلك التكلفة والأقساط). إنشاء Endpoint لربط خطة العلاج بالدفع. إنشاء Endpoint لعرض تفاصيل خطة علاج مريض معين. إنشاء Endpoint لتنزيل خطة العلاج (PDF Generation)."
-                },
-                {
-                    "id": 15,
-                    "name": "API الدفع (للطبيب)",
-                    "nameEn": "Doctor Payment API",
-                    "hours": 3,
-                    "completed": false,
-                    "order": 15,
-                    "description": "إنشاء Endpoint لعرض سجل الدفعات المستلمة. (المريض - المبلغ - الميعاد) إنشاء Endpoint لمتابعة حاله مريض الطبيب (اسم المريض : احمد سعيد فارس - مراحل العلاج المرحلة - الحاله - تفاصيل المدفوعات لكل مرحلة المرحلة حالة الدفع )"
-                },
-                {
-                    "id": 16,
-                    "name": "API لوحة التحكم الرئيسية للمعمل",
-                    "nameEn": "Lab Dashboard API",
-                    "hours": 1,
-                    "completed": false,
-                    "order": 16,
-                    "description": "إنشاء Endpoint لعرض قائمة الأطباء المتعاملين مع المعمل."
-                },
-                {
-                    "id": 17,
-                    "name": "API إدارة الأطباء (للمعمل)",
-                    "nameEn": "Lab Doctor Management API",
-                    "hours": 3,
-                    "completed": false,
-                    "order": 17,
-                    "description": "إنشاء Endpoint لإضافة طبيب جديد مرتبط بالمعمل. (اسم الطبيب - رقم هاتف الطبيب - البريد الإلكتروني - السن - النوع ) إنشاء Endpoint متابعة حالات الاطباء - قائمة الاطباء يوجد فيها جميع الاطباء في المعمل و المرضى المرتبطين بالطبيب و يتم التحكم فيهم من خلال الادمن بانل إنشاء Endpoint عند لضغط علي المريض المرتبط ب طبيب المعمل يتم عرض نوع الخدمات المتاحه للمريض وهم طلب خطة العلاج فقط - طلب خطة العلاج والنماذج المطبوعة - التقويم النهائي"
-                },
-                {
-                    "id": 18,
-                    "name": "API اضافة مريض جديد لطبيب (للمعمل)",
-                    "nameEn": "Lab Add Patient API",
-                    "hours": 1,
-                    "completed": false,
-                    "order": 18,
-                    "description": "إنشاء Endpoint لإضافة مريض جديد لطبيب (اسم المريض - رقم هاتف المريض - البريد الإلكتروني - السن - النوع )"
-                },
-                {
-                    "id": 19,
-                    "name": "API إدارة الخدمات (للمعمل)",
-                    "nameEn": "Lab Services Management API",
-                    "hours": 5,
-                    "completed": false,
-                    "order": 19,
-                    "description": "هناك ثلاث انواع من الخدمات التي يقدمها الطبيب المرتبط بالمعمل للمريض و هم طلب خطة العلاج فقط و هنا يتم توجيه لاكمال ورفع المقاسات للمريض الثانيه طلب خطة العلاج والنماذج المطبوعة و هنا يتم توجيهه لاكمال بيانات رفع المقاسات و من ثم دفع تكلفة النماذج المطبوعة و النوع الاخير و هو الشامل للمريض يتم توجيهه لاكمال بيانات رفع المقاس إنشاء Endpoint لطلب خطة علاج لمريض (مرتبط بطبيب). يتم رفع المقاسات أولًا قبل البدء في العلاج اختار ملف SDL للمريض إنشاء Endpoint لعرض ومراقبة حالات الأطباء. إنشاء Endpoint لعرض خطط عمل الأطباء وتنزيلها. إنشاء Endpoint لعرض تفاصيل خطة علاج محددة لطبيب."
-                },
-                {
-                    "id": 20,
-                    "name": "API الدفع (للمعمل)",
-                    "nameEn": "Lab Payment API",
-                    "hours": 2,
-                    "completed": false,
-                    "order": 20,
-                    "description": "إنشاء Endpoints لدفع رسوم الخدمات (الخطط، النماذج، الشحن). إنشاء Endpoint لمعالجة ردود بوابة الدفع وتحديث الحالة. إنشاء Endpoint لعرض سجل الدفع للمعمل."
-                },
-                {
-                    "id": 21,
-                    "name": "تدفق الطبيب خارج مصر",
-                    "nameEn": "Doctor/Lab Outside Egypt Flow API",
-                    "hours": 2,
-                    "completed": false,
-                    "order": 21,
-                    "description": "تطوير Endpoints مشابهة لتدفق المعمل مع مراعاة خصوصية التعامل الدولي (الشحن، العملات قد تختلف) و يتطلب معلومات اكثر عن الطبيب او المعمل الخارج مصر"
-                },
-                {
-                    "id": 22,
-                    "name": "API عرض الإشعارات",
-                    "nameEn": "Notifications Display API",
-                    "hours": 2,
-                    "completed": false,
-                    "order": 22,
-                    "description": "انواع الاشعارات هي التنويه علي القسط التالي للمريض للمعل تم مراجعة الحساب و تم التفعيل للمريض و للمعمل و الطبيب تم وضع خطة العلاج للمريض etc. إنشاء Endpoint لجلب قائمة الإشعارات الخاصة بالمستخدم الحالي. إنشاء Endpoint لتمييز الإشعارات كمقروءة."
-                },
-                {
-                    "id": 23,
-                    "name": "نظام الإشعارات الفوري",
-                    "nameEn": "Real-time Notifications System",
-                    "hours": 2,
-                    "completed": false,
-                    "order": 23,
-                    "description": "تطبيق منطق لإرسال إشعارات ( Notifications) عند وقوع أحداث معينة (حجز جديد، تحديث خطة، دفعة جديدة، إلخ) إنشاء Endpoints لجلب محتوى الصفحات العامة (عن التطبيق، سياسة الخصوصية، الشروط والأحكام) من قاعدة البيانات."
-                }
-            ]
+          "id": 2,
+          "name": "إعداد قاعدة البيانات",
+          "nameEn": "Database Setup",
+          "hours": 10,
+          "completed": true,
+          "order": 2,
+          "description": "تصميم مخطط قاعدة البيانات (Schema) ليشمل جميع الجداول المطلوبة (Users, Patients, Doctors, Labs, Appointments, Treatments, Payments, Notifications, etc.). إنشاء ملفات (Migrations) لجميع الجداول. إنشاء ملفات (Seeders) للبيانات الأولية (مثل أنواع المستخدمين، الحالات الافتراضية)."
         },
         {
-            "id": 3,
-            "name": "المرحلة الثالثة: تطوير لوحة التحكم",
-            "nameEn": "Admin Panel Development",
-            "order": 3,
-            "progress": 28.57142857142857,
-            "tasks": [
-                {
-                    "id": 24,
-                    "name": "إعداد واجهة لوحة التحكم",
-                    "nameEn": "Admin Panel Interface Setup",
-                    "hours": 2,
-                    "completed": true,
-                    "order": 24,
-                    "description": "انشاء لوحة تحكم ( Native customized) . تصميم واجهات لوحة التحكم لتكون سهلة الاستخدام. \n\nتطوير واجهات لعرض التقارير والإحصائيات الأساسية dashboard analysis."
-                },
-                {
-                    "id": 30,
-                    "name": "متابعه _ اعداد واجه لوحة التحكم ",
-                    "nameEn": "متابعه _ اعداد واجه لوحة التحكم ",
-                    "hours": 2,
-                    "completed": true,
-                    "order": 30,
-                    "description": "تطوير CRUD لإدارة كل ما يتعلق ب ال master doctor من معلومات و ايضا تطوير منظومه موسعه من خلال\nانشاء crud  للتحكم في ربط و انشاء اكثر من عياده بجميع معلوماتها لنفس الطبيب master doctor ."
-                },
-                {
-                    "id": 31,
-                    "name": "متابعه _ اعداد واجه لوحة التحكم",
-                    "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
-                    "hours": 10,
-                    "completed": false,
-                    "order": 31,
-                    "description": "انشاء crud  لكل من  \n1- Patient\n2- Doctor \n3- Admin\n4- User\n5- lab\n6- internal provider (lab / doctor)\n7- patient activation\n8- clinic history visit\n9- home page slider \n\nlocalization for every crud [ar - en]"
-                },
-                {
-                    "id": 32,
-                    "name": "متابعه _ اعداد واجه لوحة التحكم",
-                    "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
-                    "hours": 3,
-                    "completed": false,
-                    "order": 32,
-                    "description": "انشاء treatment plan management system .\n"
-                },
-                {
-                    "id": 33,
-                    "name": "متابعه _ اعداد واجه لوحة التحكم",
-                    "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
-                    "hours": 2,
-                    "completed": false,
-                    "order": 33,
-                    "description": "check for all localization in all dashboard"
-                },
-                {
-                    "id": 34,
-                    "name": "متابعه _ اعداد واجه لوحة التحكم",
-                    "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
-                    "hours": 2,
-                    "completed": false,
-                    "order": 34,
-                    "description": "\nتطوير واجهات لمتابعة وإدارة عمليات الدفع والأقساط. "
-                },
-                {
-                    "id": 35,
-                    "name": "متابعه _ اعداد واجه لوحة التحكم",
-                    "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
-                    "hours": 2,
-                    "completed": false,
-                    "order": 35,
-                    "description": "تطوير واجهات لتعديل محتوى الصفحات العامة. "
-                }
-            ]
-        },
-        {
-            "id": 4,
-            "name": "المرحلة الرابعة: التكامل والاختبار",
-            "nameEn": "Integration & Testing",
-            "order": 4,
-            "progress": 33.33333333333333,
-            "tasks": [
-                {
-                    "id": 25,
-                    "name": "تكامل خدمة SMS",
-                    "nameEn": "SMS Service Integration",
-                    "hours": 3,
-                    "completed": false,
-                    "order": 25,
-                    "description": "تكامل مع مزود خدمة  fire base."
-                },
-                {
-                    "id": 26,
-                    "name": "كتابة الاختبارات",
-                    "nameEn": "Unit & Feature Tests",
-                    "hours": 5,
-                    "completed": true,
-                    "order": 26,
-                    "description": "كتابة اختبارات الوحدة والـ Feature Tests للوظائف والـ API Endpoints الحرجة يتم تحديثها خطوه بخطوه من خلال القيام ب اختبار الاجزاء قبل نشرها و من ثم يتم المتابعه مع ال mobile developer في الاخطاء و الاقتراحات التي يجب تعديلها ."
-                },
-                {
-                    "id": 27,
-                    "name": "اختبار الـ API",
-                    "nameEn": "API Testing",
-                    "hours": 8,
-                    "completed": false,
-                    "order": 27,
-                    "description": "اختبار جميع الـ API Endpoints باستخدام أدوات مثل Postman. التنسيق مع مطور تطبيق الموبايل لاختبار التكامل."
-                }
-            ]
-        },
-        {
-            "id": 5,
-            "name": "المرحلة الخامسة: النشر والصيانة",
-            "nameEn": "Deployment & Maintenance",
-            "order": 5,
-            "progress": 100,
-            "tasks": [
-                {
-                    "id": 28,
-                    "name": "إعداد خادم الإنتاج",
-                    "nameEn": "Production Server Setup",
-                    "hours": 2,
-                    "completed": true,
-                    "order": 28,
-                    "description": "تجهيز خادم مناسب وتثبيت المتطلبات. تكوين الخادم للأمان والأداء."
-                },
-                {
-                    "id": 29,
-                    "name": "نشر التطبيق",
-                    "nameEn": "Application Deployment",
-                    "hours": 3,
-                    "completed": true,
-                    "order": 29,
-                    "description": "نشر الكود وتشغيل الأوامر اللازمة (Migrations, Seeders, etc.).\n تكوين الـ Cron Jobs.\n إعداد نظام للمراقبة وتسجيل الأخطاء LOG.\n هذه التقديرات لا تشمل وقت إدارة المشروع، التواصل، المراجعات، أو التعديلات غير المتوقعة. تعتمد التقديرات على توفر متطلبات واضحة وثابتة نسبيًا. تكامل خدمات الطرف الثالث (بوابات الدفع ) قد يتطلب وقتًا إضافيًا حسب تعقيد الخدمة والتوثيق المتاح."
-                }
-            ]
+          "id": 3,
+          "name": "إعداد نظام المصادقة",
+          "nameEn": "Authentication System Setup",
+          "hours": 4,
+          "completed": true,
+          "order": 3,
+          "description": "تكوين نظام المصادقة باستخدام Laravel Sanctum  لدعم API Tokens لتطبيق الموبايل. تطبيق نظام (Roles & Permissions) للتحكم في وصول المستخدمين المختلفين (Patient, Doctor, Lab, Admin, Doctor/Lab Outside Egypt)."
         }
-    ]
+      ]
+    },
+    {
+      "id": 2,
+      "name": "المرحلة الثانية: تطوير الواجهة البرمجية للتطبيق",
+      "nameEn": "API Development",
+      "order": 2,
+      "progress": 94.73684210526315,
+      "tasks": [
+        {
+          "id": 4,
+          "name": "API تسجيل الدخول/الخروج",
+          "nameEn": "Login/Logout API",
+          "hours": 2,
+          "completed": true,
+          "order": 4,
+          "description": "إنشاء Endpoints لتسجيل دخول المستخدمين (Patient, Doctor, Lab, Doctor/Lab Outside Egypt) باستخدام بيانات الاعتماد المناسبة (بريد إلكتروني وكلمة مرور). إنشاء Endpoint لتسجيل الخروج وحذف Token."
+        },
+        {
+          "id": 5,
+          "name": "API إنشاء حساب جديد",
+          "nameEn": "Registration API",
+          "hours": 4,
+          "completed": true,
+          "order": 5,
+          "description": "إنشاء Endpoints لإنشاء حسابات [Patient - Doctor -Lab Internal provider (Lab - Doctor)] جديدة لكل نوع مستخدم (مع التحقق من صحة البيانات). تطبيق آلية التحقق عبر  Email للمرضى (يتطلب تكامل مع خدمة  (OTP)Email Gateway). تطبيق آلية انتظار الموافقة لحسابات المعامل والأطباء."
+        },
+        {
+          "id": 6,
+          "name": "API استعادة كلمة المرور",
+          "nameEn": "Password Recovery API",
+          "hours": 1,
+          "completed": true,
+          "order": 6,
+          "description": "إنشاء Endpoints لطلب إعادة تعيين كلمة المرور وإرسال رمز عبر البريد الإلكتروني. إنشاء Endpoint لتحديث كلمة المرور."
+        },
+        {
+          "id": 7,
+          "name": "API إدارة الملف الشخصي",
+          "nameEn": "Profile Management API",
+          "hours": 1,
+          "completed": true,
+          "order": 7,
+          "description": "إنشاء Endpoint لعرض بيانات الحساب\nانشاء Endpointلتحديث بيانات الملف الشخصي لكل نوع مستخدم.\n إنشاء Endpoint لحذف الحساب.\n إنشاء Endpoint لتسجيل الخروج وحذف Token.\nانشاء   للحساب Endpoint  Deactivate"
+        },
+        {
+          "id": 8,
+          "name": "API لوحة التحكم الرئيسية للمريض",
+          "nameEn": "Patient Dashboard API",
+          "hours": 3,
+          "completed": true,
+          "order": 8,
+          "description": "إنشاء Endpoint لعرض بيانات لوحة التحكم (الترحيب، الموعد القادم، موقع العيادة علي الخريطة و ايضا مكانها نصيا).\n هناك seleders لعرض معلومات عباره عن صوره و title و description -time duration - Url link  \nانشاء CRUD Slider يتم التحكم فيهم من خلال الادمن بانل عن طريق ادخال البيانات المطلوبة  و التعديل عليها و حزفها او ايقاف تشغيلها"
+        },
+        {
+          "id": 9,
+          "name": "API حجز المواعيد",
+          "nameEn": "Appointment Booking API",
+          "hours": 2,
+          "completed": true,
+          "order": 9,
+          "description": "إنشاء Endpoint لعرض المواعيد المتاحة في التقويم. إنشاء Endpoint لحجز موعد جديد وتأكيده."
+        },
+        {
+          "id": 10,
+          "name": "API الدفع (للمريض)",
+          "nameEn": "Patient Payment API",
+          "hours": 4,
+          "completed": true,
+          "order": 10,
+          "description": "إنشاء Endpoints لبدء عملية الدفع (للحجز أو الأقساط) وتوليد رابط/معلومات بوابة الدفع. وتحديث حالة الدفع. إنشاء Endpoint لعرض سجل الدفع للمريض. (الميعاد و المبلغ)"
+        },
+        {
+          "id": 11,
+          "name": "لوحة تحكم المريض",
+          "nameEn": "Patient Control Panel",
+          "hours": 7,
+          "completed": true,
+          "order": 11,
+          "description": "إنشاء Endpoint لعرض سجل زيارات المريض. (التاريخ و الزيارة)\nإنشاء Endpoint لعرض تفاصيل الفحص الأولي.\nإنشاء Endpoint لطلب خطة علاج و بعد قبولها من لوحه التحكم يتم بعدها.\nإنشاء Endpoint لعرض خطة العلاج التي تم انشائها من الداشبورد للمريض وتفاصيل الأقساط. (فيديو لشرح خطة العلاج يتم رفعه و تفاصيل خطة العلاج ( اسم الخطة: تقويم الأسنان التجميلي مدة العلاج: 6 أشهر الطبيب المشرف: د. أحمد العتيبي ال [master doctor] ) و القسط التالي) - التكلفة الاجمالية - جدول اقساط التقويم (القسط - الميعاد - المبلغ).\nإنشاء Endpoint لقبول خطة العلاج  (يتم انشائها لكي يتمكن المريض من الاطلاع علي خطه العلاج و لاتكلفه و كل معلومات الاقساط و من بعدها يمكن ان يقبل خطه العلاج او يرفضها او يتم التفاوض فيها من خلال كتابه تفسير للتفاوض من خلال الاتي ).\nإنشاء Endpoint لطلب تعديل خطة العلاج. \nإنشاء Endpoint لعرض حالة متابعة العلاج والأقساط.(موعد زيارة العيادة لاستلام التقويم - جدول تركيب التقويم للمريض (مكان التركيب -الميعاد -التقويم - امكانية حجز الموعد المحدد) - القسط التالي (القسط - الميعاد - المبلغ) - حالة القسط (مدفوع - غير مدفوع)).\n إنشاء Endpoint لتنزيل التقارير الطبية (PDF Generation)."
+        },
+        {
+          "id": 13,
+          "name": "API إدارة المرضى (للطبيب)",
+          "nameEn": "Doctor Patient Management API",
+          "hours": 2,
+          "completed": true,
+          "order": 13,
+          "description": "إنشاء Endpoint لإضافة مريض جديد ورفع ملفاته (صور، أشعة). [اسم المريض -رفع صور الفم الداخلية-رفع صور الوجه الخارجية-رفع أشعة بانورامية- رفع الأشعة الجانبية -رفع المسح الرقمي للأسنان- دفع رسوم الخطة ] .إنشاء Endpoint لعرض قائمة مرضى الطبيب."
+        },
+        {
+          "id": 14,
+          "name": "API خطة العلاج (للطبيب)",
+          "nameEn": "Doctor Treatment Plan API",
+          "hours": 3,
+          "completed": true,
+          "order": 14,
+          "description": "إنشاء Endpoint لإعداد/تعديل خطة العلاج للمريض (بما في ذلك التكلفة والأقساط). إنشاء Endpoint لربط خطة العلاج بالدفع. إنشاء Endpoint لعرض تفاصيل خطة علاج مريض معين. إنشاء Endpoint لتنزيل خطة العلاج (PDF Generation)."
+        },
+        {
+          "id": 15,
+          "name": "API الدفع (للطبيب)",
+          "nameEn": "Doctor Payment API",
+          "hours": 4,
+          "completed": true,
+          "order": 15,
+          "description": "إنشاء Endpoint لعرض سجل الدفعات المستلمة. (المريض - المبلغ - الميعاد) إنشاء Endpoint لمتابعة حاله مريض الطبيب (اسم المريض : احمد سعيد فارس - مراحل العلاج المرحلة - الحاله - تفاصيل المدفوعات لكل مرحلة المرحلة حالة الدفع )"
+        },
+        {
+          "id": 16,
+          "name": "API لوحة التحكم الرئيسية للمعمل",
+          "nameEn": "Lab Dashboard API",
+          "hours": 1,
+          "completed": true,
+          "order": 16,
+          "description": "إنشاء Endpoint لعرض قائمة الأطباء المتعاملين مع المعمل."
+        },
+        {
+          "id": 17,
+          "name": "API إدارة الأطباء (للمعمل)",
+          "nameEn": "Lab Doctor Management API",
+          "hours": 4,
+          "completed": true,
+          "order": 17,
+          "description": "إنشاء Endpoint لإضافة طبيب جديد مرتبط بالمعمل. (اسم الطبيب - رقم هاتف الطبيب - البريد الإلكتروني - السن - النوع ) إنشاء Endpoint متابعة حالات الاطباء - قائمة الاطباء يوجد فيها جميع الاطباء في المعمل و المرضى المرتبطين بالطبيب و يتم التحكم فيهم من خلال الادمن بانل إنشاء Endpoint عند لضغط علي المريض المرتبط ب طبيب المعمل يتم عرض نوع الخدمات المتاحه للمريض وهم طلب خطة العلاج فقط - طلب خطة العلاج والنماذج المطبوعة - التقويم النهائي"
+        },
+        {
+          "id": 18,
+          "name": "API اضافة مريض جديد لطبيب (للمعمل)",
+          "nameEn": "Lab Add Patient API",
+          "hours": 1,
+          "completed": true,
+          "order": 18,
+          "description": "إنشاء Endpoint لإضافة مريض جديد لطبيب (اسم المريض - رقم هاتف المريض - البريد الإلكتروني - السن - النوع )"
+        },
+        {
+          "id": 19,
+          "name": "API إدارة الخدمات (للمعمل)",
+          "nameEn": "Lab Services Management API",
+          "hours": 6,
+          "completed": true,
+          "order": 19,
+          "description": "هناك ثلاث انواع من الخدمات التي يقدمها الطبيب المرتبط بالمعمل للمريض و هم طلب خطة العلاج فقط و هنا يتم توجيه لاكمال ورفع المقاسات للمريض الثانيه طلب خطة العلاج والنماذج المطبوعة و هنا يتم توجيهه لاكمال بيانات رفع المقاسات و من ثم دفع تكلفة النماذج المطبوعة و النوع الاخير و هو الشامل للمريض يتم توجيهه لاكمال بيانات رفع المقاس إنشاء Endpoint لطلب خطة علاج لمريض (مرتبط بطبيب). يتم رفع المقاسات أولًا قبل البدء في العلاج اختار ملف SDL للمريض إنشاء Endpoint لعرض ومراقبة حالات الأطباء. إنشاء Endpoint لعرض خطط عمل الأطباء وتنزيلها. إنشاء Endpoint لعرض تفاصيل خطة علاج محددة لطبيب."
+        },
+        {
+          "id": 21,
+          "name": "تدفق الطبيب خارج مصر",
+          "nameEn": "Doctor/Lab Outside Egypt Flow API",
+          "hours": 2,
+          "completed": true,
+          "order": 21,
+          "description": "تطوير Endpoints مشابهة flow  الطبيب داخل مصر مع مراعاة خصوصية التعامل الدولي ( العملات قد تختلف) و يتطلب معلومات اكثر عن الطبيب او المعمل الخارج مصر"
+        },
+        {
+          "id": 22,
+          "name": "API عرض الإشعارات",
+          "nameEn": "Notifications Display API",
+          "hours": 2,
+          "completed": false,
+          "order": 22,
+          "description": "انواع الاشعارات هي التنويه علي القسط التالي للمريض للمعل تم مراجعة الحساب و تم التفعيل للمريض و للمعمل و الطبيب تم وضع خطة العلاج للمريض etc. إنشاء Endpoint لجلب قائمة الإشعارات الخاصة بالمستخدم الحالي. إنشاء Endpoint لتمييز الإشعارات كمقروءة.\nتطبيق منطق لإرسال إشعارات ( Notifications) عند وقوع أحداث معينة (حجز جديد، تحديث خطة، دفعة جديدة، إلخ) "
+        },
+        {
+          "id": 23,
+          "name": "نظام الإشعارات الفوري",
+          "nameEn": "Real-time Notifications System",
+          "hours": 2,
+          "completed": true,
+          "order": 23,
+          "description": "إنشاء Endpoints لجلب محتوى الصفحات العامة (عن التطبيق، سياسة الخصوصية، الشروط والأحكام) من قاعدة البيانات."
+        },
+        {
+          "id": 37,
+          "name": "تدفق الطبيب خارج مصر",
+          "nameEn": "تدفق الطبيب خارج مصر",
+          "hours": 2,
+          "completed": true,
+          "order": 37,
+          "description": "تطوير Endpoints مشابهة flow  المعمل داخل مصر مع مراعاة خصوصية التعامل الدولي ( العملات قد تختلف) و يتطلب معلومات اكثر عن الطبيب او المعمل الخارج مصر"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "المرحلة الثالثة: تطوير لوحة التحكم",
+      "nameEn": "Admin Panel Development",
+      "order": 3,
+      "progress": 92.85714285714286,
+      "tasks": [
+        {
+          "id": 24,
+          "name": "إعداد واجهة لوحة التحكم",
+          "nameEn": "Admin Panel Interface Setup",
+          "hours": 2,
+          "completed": true,
+          "order": 24,
+          "description": "انشاء لوحة تحكم ( Native customized) . تصميم واجهات لوحة التحكم لتكون سهلة الاستخدام. \n\nتطوير واجهات لعرض التقارير والإحصائيات الأساسية dashboard analysis."
+        },
+        {
+          "id": 30,
+          "name": "متابعه _ اعداد واجه لوحة التحكم ",
+          "nameEn": "متابعه _ اعداد واجه لوحة التحكم ",
+          "hours": 2,
+          "completed": true,
+          "order": 30,
+          "description": "تطوير CRUD لإدارة كل ما يتعلق ب ال master doctor من معلومات و ايضا تطوير منظومه موسعه من خلال\nانشاء crud  للتحكم في ربط و انشاء اكثر من عياده بجميع معلوماتها لنفس الطبيب master doctor ."
+        },
+        {
+          "id": 31,
+          "name": "متابعه _ اعداد واجه لوحة التحكم",
+          "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
+          "hours": 10,
+          "completed": true,
+          "order": 31,
+          "description": "انشاء crud  لكل من  \n1- Patient\n2- Doctor \n3- Admin\n4- User\n5- lab\n6- internal provider (lab / doctor)\n7- patient activation\n8- clinic history visit\n9- home page slider \n\nlocalization for every crud [ar - en]"
+        },
+        {
+          "id": 32,
+          "name": "متابعه _ اعداد واجه لوحة التحكم",
+          "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
+          "hours": 4,
+          "completed": true,
+          "order": 32,
+          "description": "انشاء treatment plan management system .\n للتحكم في وضع خطط العلاج لكل من المرضي الخاصين بالطبيب - المرضي التابعين لاطباء داخل التطبيق المرضي التابعين لاطباء من خارج مصر داخل التطبيق "
+        },
+        {
+          "id": 33,
+          "name": "متابعه _ اعداد واجه لوحة التحكم",
+          "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
+          "hours": 7,
+          "completed": true,
+          "order": 33,
+          "description": "ترجمه جميع الصفح الموجوده في الادمن بانل عربي و انجليزي و عددها اكثر من 80 صفحه داخليه ."
+        },
+        {
+          "id": 34,
+          "name": "متابعه _ اعداد واجه لوحة التحكم",
+          "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
+          "hours": 2,
+          "completed": true,
+          "order": 34,
+          "description": "\nتطوير واجهات لمتابعة وإدارة عمليات الدفع والأقساط. "
+        },
+        {
+          "id": 35,
+          "name": "متابعه _ اعداد واجه لوحة التحكم",
+          "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
+          "hours": 2,
+          "completed": true,
+          "order": 35,
+          "description": "تطوير واجهات لتعديل محتوى الصفحات العامة. "
+        },
+        {
+          "id": 38,
+          "name": "متابعه _ اعداد واجه لوحة التحكم",
+          "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
+          "hours": 2,
+          "completed": true,
+          "order": 38,
+          "description": "انشاء صفحه تحكم كامل بالبانر الذي يظهر في التطبيق مع امانيه التحكم في الوقت و وضع نص و صوره و و ترتيب ايضا"
+        },
+        {
+          "id": 39,
+          "name": "متابعه _ اعداد واجه لوحة التحكم",
+          "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
+          "hours": 2,
+          "completed": true,
+          "order": 39,
+          "description": "انشاء صفحات التحكم الكامل في تسجيل زيارات العياده Patient Clinic History Management "
+        },
+        {
+          "id": 40,
+          "name": "Patient Clinic History Management",
+          "nameEn": "Patient Clinic History Management",
+          "hours": 1,
+          "completed": true,
+          "order": 40,
+          "description": "انشاء صفح تحكم كامل للعيادات التابعه للدكتور صاحب التطبيق  بامكانه مع زياده عياداته في الواقع تسجيلها داخل الطبيق (متوقفه عملها فقط حاليا علي العياده الاولي)"
+        },
+        {
+          "id": 41,
+          "name": "متابعه _ اعداد واجه لوحة التحكم",
+          "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
+          "hours": 2,
+          "completed": true,
+          "order": 41,
+          "description": "انشاء صفحه اعدادات للتحكم في الداشبورد و ايضا التحكم في الاشعارات firebase  من خلال تعطيلها او تشغيلها "
+        },
+        {
+          "id": 42,
+          "name": "متابعه _ اعداد واجه لوحة التحكم",
+          "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
+          "hours": 6,
+          "completed": true,
+          "order": 42,
+          "description": "انشاء صفح للتحكم الكامل في عرض طلبات المعامل من خلال اضافه المرضي و عرضهم اضاقه الاطباء و عرضهم  عرض كل طلبات خطط العلاج و التحكم فيها و يوجد ايضا ميزه عرض ملفات ال 3d المرفوعه من قبل المريض و ايضا التحكم في رفع النمازج المطبوعه للمريض الذي يطلبها "
+        },
+        {
+          "id": 43,
+          "name": "متابعه _ اعداد واجه لوحة التحكم",
+          "nameEn": "متابعه _ اعداد واجه لوحة التحكم",
+          "hours": 3,
+          "completed": true,
+          "order": 43,
+          "description": "عمل سستم اشعارت للادمن بحيث يظهر له المسجلين في التطبيق الجدد لكي يقوم بمراقبه طلبات التسجيل و ايضا متابعه اي حجز جديد و طلب خطه علاج  "
+        },
+        {
+          "id": 46,
+          "name": "مراجعه صفحات التحكم بالكامل",
+          "nameEn": "مراجعه صفحات التحكم بالكامل",
+          "hours": 1,
+          "completed": false,
+          "order": 46,
+          "description": "للتاكد من عدم خلوها من الاخطاء"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "المرحلة الرابعة: التكامل والاختبار",
+      "nameEn": "Integration & Testing",
+      "order": 4,
+      "progress": 66.66666666666666,
+      "tasks": [
+        {
+          "id": 26,
+          "name": "كتابة الاختبارات",
+          "nameEn": "Unit & Feature Tests",
+          "hours": 5,
+          "completed": true,
+          "order": 26,
+          "description": "كتابة اختبارات الوحدة والـ Feature Tests للوظائف والـ API Endpoints الحرجة يتم تحديثها خطوه بخطوه من خلال القيام ب اختبار الاجزاء قبل نشرها و من ثم يتم المتابعه مع ال mobile developer في الاخطاء و الاقتراحات التي يجب تعديلها ."
+        },
+        {
+          "id": 27,
+          "name": "اختبار الـ API",
+          "nameEn": "API Testing",
+          "hours": 8,
+          "completed": true,
+          "order": 27,
+          "description": "اختبار جميع الـ API Endpoints باستخدام أدوات مثل Postman."
+        },
+        {
+          "id": 45,
+          "name": "مراجعه و متابعه كل ال endpoints",
+          "nameEn": "مراجعه و متابعه كل ال endpoints",
+          "hours": 1,
+          "completed": false,
+          "order": 45,
+          "description": "مراجعه و متابعه كل ال endpoints للتاكد من خلوها من الاخطاء"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "المرحلة الخامسة: النشر والصيانة",
+      "nameEn": "Deployment & Maintenance",
+      "order": 5,
+      "progress": 66.66666666666666,
+      "tasks": [
+        {
+          "id": 28,
+          "name": "إعداد خادم الإنتاج",
+          "nameEn": "Production Server Setup",
+          "hours": 2,
+          "completed": true,
+          "order": 28,
+          "description": "تجهيز خادم مناسب وتثبيت المتطلبات. تكوين الخادم للأمان والأداء."
+        },
+        {
+          "id": 29,
+          "name": "نشر التطبيق",
+          "nameEn": "Application Deployment",
+          "hours": 3,
+          "completed": true,
+          "order": 29,
+          "description": "نشر الكود وتشغيل الأوامر اللازمة (Migrations, Seeders, etc.).\n تكوين الـ Cron Jobs.\nو التاكد من عمل التطبيق بشكل جيد علي السيرفر  "
+        },
+        {
+          "id": 44,
+          "name": "مراجعه كل الصفح علي السيرفر ",
+          "nameEn": "مراجعه كل الصفح علي السيرفر ",
+          "hours": 1,
+          "completed": false,
+          "order": 44,
+          "description": "مراجعه كل الصفح علي السيرفر للتاكد من خلوها من الاخطاء"
+        }
+      ]
+    }
+  ]
 }
